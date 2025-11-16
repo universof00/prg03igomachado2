@@ -10,6 +10,8 @@ Esse Repositório tem como objetivo adicionar todas as atividades da disciplina 
 
 # Atividades Feitas até esse momento da 2ª parte...
 
-- Atividade 11: ✅
-- Atividade 12: ✅
+- Atividade 11: ✅ - (Adicionado as Telas e Classes)
+- Atividade 12: ✅ - (Gerenciamento curso BS + Exceção)
+- Atividade 13: ✅ - (DAO)
+
 
