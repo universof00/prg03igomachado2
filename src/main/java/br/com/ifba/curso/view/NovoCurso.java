@@ -5,6 +5,8 @@
 package br.com.ifba.curso.view;
 
 import br.com.ifba.CursoSave;
+import br.com.ifba.curso.dao.CursoDao;
+import br.com.ifba.curso.dao.CursoIDao;
 import br.com.ifba.curso.entity.Curso;
 import javax.swing.JOptionPane;
 
@@ -103,18 +105,33 @@ public class NovoCurso extends javax.swing.JFrame {
 
     private void btnAdicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarActionPerformed
         // TODO add your handling code here:
+        
         Curso novoCurso = new Curso(txtNomeCurso.getText(), txtCodigo.getText());
-         // Classe responsável por salvar o curso no banco (persistência JPA)
-        CursoSave salvar = new CursoSave();
-        salvar.save(novoCurso);
-        JOptionPane.showMessageDialog(null, "Curso " + txtNomeCurso.getText() + " Salvo com sucesso");
-         
-        if (this.telaPrincipal != null) {
-            this.telaPrincipal.adicionarLinhaNaTabela(novoCurso); 
+
+        CursoIDao cursoAdicionar = new CursoDao(); 
+        Curso cursoSalvo = null; 
+
+        try {
+            
+            cursoSalvo = cursoAdicionar.save(novoCurso);
+
+          
+            JOptionPane.showMessageDialog(this, "Curso " + novoCurso.getNome() + " Salvo com sucesso! ID: " + cursoSalvo.getId());
+
+            
+            if (this.telaPrincipal != null) {
+                this.telaPrincipal.adicionarLinhaNaTabela(cursoSalvo); 
+            }
+
+        } catch (Exception e) {
+             
+            JOptionPane.showMessageDialog(this, "Erro ao salvar o curso: " + e.getMessage(), "Erro de Persistência", JOptionPane.ERROR_MESSAGE);
+
+        } finally {
+            
+            dispose();
         }
-        
-        this.dispose();
-        
+    
     }//GEN-LAST:event_btnAdicionarActionPerformed
 
     /**

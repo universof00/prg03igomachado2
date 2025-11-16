@@ -4,6 +4,8 @@
  */
 package br.com.ifba.curso.view;
 
+import br.com.ifba.curso.dao.CursoDao;
+import br.com.ifba.curso.dao.CursoIDao;
 import br.com.ifba.curso.entity.Curso;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -38,10 +40,10 @@ public class CursoListar extends javax.swing.JFrame {
     public CursoListar() {
         initComponents();
         carregarCursos();
-        DefaultTableModel modelo = (DefaultTableModel) jTableCursos.getModel();
+        DefaultTableModel modelo = (DefaultTableModel) jtListaDeCursos.getModel();
        
         sorter = new TableRowSorter<>(modelo);
-        jTableCursos.setRowSorter(sorter); // Ativa ordenação automática na tabela
+        jtListaDeCursos.setRowSorter(sorter); // Ativa ordenação automática na tabela
         anexarListenerBusca();
         
          btnEditar.setVisible(false);
@@ -51,13 +53,13 @@ public class CursoListar extends javax.swing.JFrame {
          * Listener para detectar seleção de linhas na tabela.
          * Faz com que os botões "Editar" e "Apagar" só apareçam se existir seleção.
          */
-        jTableCursos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        jtListaDeCursos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) { 
                 
                 // Lógica de verificação embutida
-                int linhaSelecionadaView = jTableCursos.getSelectedRow();
+                int linhaSelecionadaView = jtListaDeCursos.getSelectedRow();
                 boolean linhaEhSelecionada = (linhaSelecionadaView >= 0);
                 
                 // Define a visibilidade
@@ -87,7 +89,7 @@ public class CursoListar extends javax.swing.JFrame {
         try {
             cursos = em.createQuery("SELECT c FROM Curso c", Curso.class).getResultList();
 
-            DefaultTableModel model = (DefaultTableModel) jTableCursos.getModel();
+            DefaultTableModel model = (DefaultTableModel) jtListaDeCursos.getModel();
 
             model.setRowCount(0); 
 
@@ -119,7 +121,7 @@ public class CursoListar extends javax.swing.JFrame {
     
     public void adicionarLinhaNaTabela(Curso novoCurso) {
        
-        DefaultTableModel modelo = (DefaultTableModel) jTableCursos.getModel(); 
+        DefaultTableModel modelo = (DefaultTableModel) jtListaDeCursos.getModel(); 
         // Adiciona cada curso como linha da tabela
         modelo.addRow(new Object[]{
             novoCurso.getId(),
@@ -195,11 +197,11 @@ public class CursoListar extends javax.swing.JFrame {
      */
     
     public Curso getCursoSelecionado() {
-        int linhaSelecionada = jTableCursos.getSelectedRow();
+        int linhaSelecionada = jtListaDeCursos.getSelectedRow();
         if (linhaSelecionada >= 0) {
-            Long id = (Long) jTableCursos.getValueAt(linhaSelecionada, 0);
-            String codigo = (String) jTableCursos.getValueAt(linhaSelecionada, 1);
-            String nome = (String) jTableCursos.getValueAt(linhaSelecionada, 2);
+            Long id = (Long) jtListaDeCursos.getValueAt(linhaSelecionada, 0);
+            String codigo = (String) jtListaDeCursos.getValueAt(linhaSelecionada, 1);
+            String nome = (String) jtListaDeCursos.getValueAt(linhaSelecionada, 2);
 
             Curso cursoSelecionado = new Curso();
             cursoSelecionado.setId(id);
@@ -223,7 +225,7 @@ public class CursoListar extends javax.swing.JFrame {
         txtbuscar = new javax.swing.JTextField();
         btnAdicionar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTableCursos = new javax.swing.JTable();
+        jtListaDeCursos = new javax.swing.JTable();
         btnEditar = new javax.swing.JButton();
         btnApagar = new javax.swing.JButton();
         lblTextoPesquisar = new javax.swing.JLabel();
@@ -243,7 +245,7 @@ public class CursoListar extends javax.swing.JFrame {
         });
         getContentPane().add(btnAdicionar, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 40, 190, 80));
 
-        jTableCursos.setModel(new javax.swing.table.DefaultTableModel(
+        jtListaDeCursos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
                 {null, null, null},
@@ -269,7 +271,7 @@ public class CursoListar extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTableCursos);
+        jScrollPane1.setViewportView(jtListaDeCursos);
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 148, 780, 286));
 
@@ -306,52 +308,36 @@ public class CursoListar extends javax.swing.JFrame {
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
         // TODO add your handling code here:
-
-      int linhaSelecionadaView = jTableCursos.getSelectedRow();
-
-      if (linhaSelecionadaView < 0) {
-          JOptionPane.showMessageDialog(this, "Selecione um curso para editar.", "Aviso", JOptionPane.WARNING_MESSAGE);
-          return;
-      }
-
-
-      int linhaSelecionadaModel = jTableCursos.convertRowIndexToModel(linhaSelecionadaView);
-
-
-      DefaultTableModel model = (DefaultTableModel) jTableCursos.getModel();
-      Long idCurso = (Long) model.getValueAt(linhaSelecionadaModel, 0); 
-
-      EntityManagerFactory emf = Persistence.createEntityManagerFactory("poobanco2");
-      EntityManager em = emf.createEntityManager();
-
-      try {
-          // 3. Busca o objeto completo no Banco de Dados (Curso antes de atualizar)
-          Curso cursoAntesDeAtualizar = em.find(Curso.class, idCurso); 
-
-          if (cursoAntesDeAtualizar == null) {
-              JOptionPane.showMessageDialog(this, "Curso não encontrado no banco de dados. O registro pode ter sido excluído.", "Erro", JOptionPane.ERROR_MESSAGE);
-              return;
-          }
-
-          // 4. Mostrar a tela de atualização, passando o objeto Curso carregado
-          // O objeto 'cursoAntesDeAtualizar' contém os dados atuais do banco.
-          CursoAtualizar telaAtualizar = new CursoAtualizar(this); 
-          telaAtualizar.setVisible(true);
-
-
-      } catch (Exception e) {
-          logger.log(Level.SEVERE, "Erro ao buscar curso para edição.", e);
-          JOptionPane.showMessageDialog(this, "Erro ao buscar dados do curso: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-      } finally {
-          if (em != null && em.isOpen()) { 
-              em.close(); 
-          }
-      }   
+        
+        Curso cursoParaAtualizar = getCursoSelecionado();
+        CursoIDao cursoAtualizar = new CursoDao();
+        //para verificar se é null ou não
+        Curso validarAtualizar = new Curso();
+    
+        if (cursoParaAtualizar == null) {
+            JOptionPane.showMessageDialog(this, "Nenhum curso foi selecionado para apagar.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        validarAtualizar = cursoAtualizar.findById(cursoParaAtualizar.getId());
+        /**
+         * se for diferente de null chama a tela para editar e atualizar sabendo o objeto
+         * tem no banco de dados
+         */
+        
+        if(validarAtualizar != null){
+            CursoAtualizar telaAtualizar = new CursoAtualizar(this); 
+            telaAtualizar.setVisible(true);  
+        }
+        
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnApagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApagarActionPerformed
         // TODO add your handling code here:
         Curso cursoParaDeletar = getCursoSelecionado();
+        CursoIDao cursoApagar = new CursoDao();
+        //para verificar se é null ou não
+        Curso validarApagar = new Curso();
     
         if (cursoParaDeletar == null) {
             JOptionPane.showMessageDialog(this, "Nenhum curso foi selecionado para apagar.", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -367,37 +353,36 @@ public class CursoListar extends javax.swing.JFrame {
             );
 
         if (confirmacao == JOptionPane.YES_OPTION) {
-            EntityManagerFactory emf = Persistence.createEntityManagerFactory("poobanco2");
-            EntityManager em = emf.createEntityManager();
-
+            
             try {
-                em.getTransaction().begin();
-                
-                Curso cursoGerenciado = em.find(Curso.class, cursoParaDeletar.getId());
+                //busca no banco para ver se realmente tem, caso tenha no if
+                validarApagar = cursoApagar.findById(cursoParaDeletar.getId());
 
-                if (cursoGerenciado != null) {
-                   
-                    em.remove(cursoGerenciado); 
-                    em.getTransaction().commit();
-                    JOptionPane.showMessageDialog(this, "Curso '" + cursoParaDeletar.getNome() + "' apagado com sucesso!");
+                if (validarApagar != null) {
+
+                    cursoApagar.delete(cursoParaDeletar.getId());
+
+                    JOptionPane.showMessageDialog(this,
+                        "Curso '" + cursoParaDeletar.getNome() + "' apagado com sucesso!");
 
                     carregarCursos();
-
-                  em.close();
-                  emf.close();
                 } else {
-                    em.getTransaction().rollback();
-                    JOptionPane.showMessageDialog(this, "Curso não encontrado no banco de dados.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                        "Curso não encontrado no banco de dados.",
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
                 }
 
             } catch (Exception e) {
-                // Em caso de erro (ex: problema de conexão, Foreign Key, etc.)
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                JOptionPane.showMessageDialog(this, "Erro ao apagar: " + e.getMessage(), "Erro de Banco", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
+
+                JOptionPane.showMessageDialog(this,
+                    "Erro ao apagar curso: " + e.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+
+                e.printStackTrace(); // para debug no console
             }
+        
         }
     }//GEN-LAST:event_btnApagarActionPerformed
 
@@ -431,7 +416,7 @@ public class CursoListar extends javax.swing.JFrame {
     private javax.swing.JButton btnApagar;
     private javax.swing.JButton btnEditar;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTableCursos;
+    private javax.swing.JTable jtListaDeCursos;
     private javax.swing.JLabel lblTextoPesquisar;
     private javax.swing.JTextField txtbuscar;
     // End of variables declaration//GEN-END:variables

@@ -4,6 +4,8 @@
  */
 package br.com.ifba.curso.view;
 
+import br.com.ifba.curso.dao.CursoDao;
+import br.com.ifba.curso.dao.CursoIDao;
 import br.com.ifba.curso.entity.Curso;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -69,26 +71,24 @@ public class CursoAtualizar extends javax.swing.JFrame {
              JOptionPane.showMessageDialog(this, "Preencha todos os campos.");
              return;
          }
-
-         EntityManagerFactory emf = Persistence.createEntityManagerFactory("poobanco2");
-         EntityManager em = emf.createEntityManager();
-
-         em.getTransaction().begin();
-         Curso curso = em.find(Curso.class, cursoSelecionado.getId());
-         if (curso != null) {
-             curso.setCodigo(txtNovoCodigo.getText());
-             curso.setNome(txtNovoNome.getText());
-             em.merge(curso);
-             em.getTransaction().commit();
-             JOptionPane.showMessageDialog(this, "Curso atualizado!");
-             //telaPrincipal.carregarCursos();
+            
+         cursoSelecionado.setCodigo(novoCodigo);
+         cursoSelecionado.setNome(novoNome);
+         
+         CursoIDao cursoAtualizar = new CursoDao();
+         
+         Curso verificar = new Curso();
+         
+         verificar = cursoAtualizar.findById(cursoSelecionado.getId());
+         if(verificar != null){
+            cursoAtualizar.save(cursoSelecionado);
+            JOptionPane.showMessageDialog(this, "Curso atualizado!");
+            dispose();
+         }else{
+             JOptionPane.showMessageDialog(this, "Não foi possível atualizar");
              dispose();
-         } else {
-             em.getTransaction().rollback();
-             JOptionPane.showMessageDialog(this, "Curso não encontrado.");
          }
-         em.close();
-         emf.close();
+       
      }
 
 

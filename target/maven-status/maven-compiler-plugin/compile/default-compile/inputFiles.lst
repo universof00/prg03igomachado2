@@ -1,4 +1,6 @@
 /home/igo/NetBeansProjects/prtg03igomachado2/src/main/java/br/com/ifba/CursoSave.java
+/home/igo/NetBeansProjects/prtg03igomachado2/src/main/java/br/com/ifba/curso/dao/CursoDao.java
+/home/igo/NetBeansProjects/prtg03igomachado2/src/main/java/br/com/ifba/curso/dao/CursoIDao.java
 /home/igo/NetBeansProjects/prtg03igomachado2/src/main/java/br/com/ifba/curso/entity/Curso.java
 /home/igo/NetBeansProjects/prtg03igomachado2/src/main/java/br/com/ifba/curso/view/CursoAtualizar.java
 /home/igo/NetBeansProjects/prtg03igomachado2/src/main/java/br/com/ifba/curso/view/CursoListar.java

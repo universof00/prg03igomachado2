@@ -4,7 +4,9 @@ br/com/ifba/curso/view/NovoCurso$1.class
 br/com/ifba/curso/view/NovoCurso.class
 br/com/ifba/curso/view/CursoAtualizar$1.class
 br/com/ifba/curso/view/CursoListar$5.class
+br/com/ifba/curso/dao/CursoIDao.class
 br/com/ifba/curso/view/CursoListar$4.class
+br/com/ifba/curso/dao/CursoDao.class
 br/com/ifba/CursoSave.class
 br/com/ifba/curso/view/CursoListar$6.class
 br/com/ifba/curso/view/CursoListar$1.class
