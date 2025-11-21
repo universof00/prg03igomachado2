@@ -4,10 +4,17 @@
  */
 package br.com.ifba.curso.service;
 
+import br.com.ifba.curso.entity.Curso;
+import java.util.List;
+
 /**
  *
  * @author igo
  */
 public interface CursoIService {
-    
+    Curso save(Curso curso);
+    Curso update(Curso curso);
+    void delete(Long id);
+    Curso findById(Long id);
+    List<Curso> findAll();
 }

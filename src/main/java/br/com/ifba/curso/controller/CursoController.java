@@ -4,6 +4,11 @@
  */
 package br.com.ifba.curso.controller;
 
+import br.com.ifba.curso.entity.Curso;
+import br.com.ifba.curso.service.CursoIService;
+import br.com.ifba.curso.service.CursoService;
+import java.util.List;
+
 /**
  *
  * @author igo

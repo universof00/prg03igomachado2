@@ -4,10 +4,16 @@
  */
 package br.com.ifba.infrastructure.dao;
 
+import java.util.List;
+
 /**
  *
  * @author igo
  */
-public interface GenericIDao {
-    
+public interface GenericIDao<T> {
+    T save(T entity);
+    T update(T entity);
+    void delete(Long id);
+    T findById(Long id);
+    List<T> findAll();
 }
