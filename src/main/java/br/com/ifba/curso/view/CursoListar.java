@@ -17,6 +17,7 @@ import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,12 +42,11 @@ public class CursoListar extends javax.swing.JFrame {
     private Curso cursoSelecionado;
     
     @Autowired
-    private CursoAtualizar cursoAtualizarFrame;
-
+    private ApplicationContext applicationContext;
     
-    public CursoListar(CursoIController cursoIController) {
+    public CursoListar(CursoIController cursoIController, ApplicationContext applicationContext) {
         this.cursoIController = cursoIController;
-        
+        this.applicationContext = applicationContext;
         initComponents();
         carregarCursos();
         
@@ -322,27 +322,32 @@ public class CursoListar extends javax.swing.JFrame {
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
         // TODO add your handling code here:
-        
-        Curso cursoParaAtualizar = getCursoSelecionado();
-        
-        Curso validarAtualizar = new Curso();
+       Curso cursoParaAtualizar = getCursoSelecionado();
     
         if (cursoParaAtualizar == null) {
-            JOptionPane.showMessageDialog(this, "Nenhum curso foi selecionado para apagar.", "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Nenhum curso foi selecionado para editar.", "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        validarAtualizar = cursoIController.findById(cursoParaAtualizar.getId());
-        /**
-         * se for diferente de null chama a tela para editar e atualizar sabendo o objeto
-         * tem no banco de dados
-         */
-        
-        if(validarAtualizar != null){
-            CursoAtualizar telaAtualizar = new CursoAtualizar(this); 
-            telaAtualizar.setVisible(true);  
+
+        // Chamada ao Controller para verificar a existência (baseado no seu código original)
+        Curso validarAtualizar = cursoIController.findById(cursoParaAtualizar.getId());
+
+        if (validarAtualizar != null) {
+
+            // 1. OBTENÇÃO CORRETA DA TELA PELO SPRING
+            // Isso garante que o CursoIController (cursoISalvar) seja injetado.
+            CursoAtualizar telaAtualizar = applicationContext.getBean(CursoAtualizar.class);
+
+            // 2. CHAMADA DOS SETTERS: Aqui você passa os dados e a referência da tela principal
+            telaAtualizar.setCursoSelecionado(validarAtualizar); 
+            telaAtualizar.setTelaPrincipal(this);              
+
+            // 3. Torna a tela visível
+            telaAtualizar.setVisible(true);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "O curso selecionado não foi encontrado no banco de dados.", "Erro", JOptionPane.ERROR_MESSAGE);
         }
-        
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnApagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApagarActionPerformed

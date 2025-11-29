@@ -4,14 +4,10 @@
  */
 package br.com.ifba.curso.view;
 
-import br.com.ifba.curso.controller.CursoController;
 import br.com.ifba.curso.controller.CursoIController;
 import br.com.ifba.curso.entity.Curso;
-import java.io.ObjectInputFilter.Config;
 import javax.swing.JOptionPane;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,19 +23,15 @@ public class CursoAtualizar extends javax.swing.JFrame {
     @Autowired
     private CursoIController cursoISalvar;
     
-    public CursoAtualizar(CursoIController cursoISalvar) {
-        this.cursoISalvar = cursoISalvar;
+    @Autowired
+    public CursoAtualizar(CursoIController controller) {
+        this.cursoISalvar = controller; // O Spring injeta o controller aqui
         initComponents();
     }
-    
-    
-   private CursoAtualizar(){
-       initComponents();
-   }
-   
-    
-   
-    
+
+    private CursoAtualizar() {
+        initComponents();
+    }
      /**
      * Construtor recomendado.
      * Recebe a tela principal, obtém o curso selecionado nela e preenche
@@ -80,10 +72,9 @@ public class CursoAtualizar extends javax.swing.JFrame {
         
         cursoSelecionado.setCodigo(novoCodigo);
         cursoSelecionado.setNome(novoNome);
-        
-        // Valida se o controller está disponível
+       
         if (cursoISalvar == null) {
-            JOptionPane.showMessageDialog(this, "Erro interno: serviço não disponível.");
+            JOptionPane.showMessageDialog(this, "Erro que tira meu sono");
             return;
         }
         
@@ -97,6 +88,22 @@ public class CursoAtualizar extends javax.swing.JFrame {
             dispose();
         }
      }
+    
+    
+    public void setCursoSelecionado(br.com.ifba.curso.entity.Curso cursoSelecionado) {
+        this.cursoSelecionado = cursoSelecionado;
+
+        if (this.cursoSelecionado != null) {
+            lblCodigoCurosoAntigo.setText(cursoSelecionado.getCodigo());
+            lblNomeCursoAntigo.setText(cursoSelecionado.getNome());
+            txtNovoCodigo.setText(cursoSelecionado.getCodigo());
+            txtNovoNome.setText(cursoSelecionado.getNome());
+        }
+    }
+    
+    public void setTelaPrincipal(br.com.ifba.curso.view.CursoListar telaPrincipal) {
+        this.telaPrincipal = telaPrincipal;
+    }
 
 
     /**

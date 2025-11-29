@@ -3,12 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package br.com.ifba.curso.service;
-
-import br.com.ifba.curso.dao.CursoDao;
-import br.com.ifba.curso.dao.CursoIDao;
 import br.com.ifba.curso.entity.Curso;
+import br.com.ifba.curso.repository.CursoRepository;
 import br.com.ifba.infrastructure.util.StringUtil;
-
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,22 +18,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class CursoService implements CursoIService {
-   
-    @Autowired
-    private CursoIDao dao;
 
+    @Autowired
+    CursoRepository cursoRepository;
    
     @Override
     public Curso save(Curso curso) {
         validarParaSalvar(curso);
 
         // --- Verificar se já existe curso com mesmo nome ---
-        Curso existenteNome = dao.findByNome(curso.getNome());
+        Curso existenteNome = cursoRepository.findBynome(curso.getNome());
         if (existenteNome != null) {
             throw new IllegalArgumentException("Já existe um curso com este nome.");
         }
 
-        return dao.save(curso);
+        return cursoRepository.save(curso);
     }
 
     // ---------------------------------------------------------------
@@ -47,18 +43,18 @@ public class CursoService implements CursoIService {
         validarParaAtualizar(curso);
 
         // --- Verificar se o curso realmente existe ---
-        Curso cursoBD = dao.findById(curso.getId());
+        Curso cursoBD = cursoRepository.findByid(curso.getId());
         if (cursoBD == null) {
             throw new IllegalArgumentException("Curso não encontrado para atualizar.");
         }
 
         // --- Verificar duplicidade de nome ---
-        Curso existenteNome = dao.findByNome(curso.getNome());
+        Curso existenteNome = cursoRepository.findBynome(curso.getNome());
         if (existenteNome != null && !existenteNome.getId().equals(curso.getId())) {
             throw new IllegalArgumentException("Nome já está em uso por outro curso.");
         }
 
-        return dao.update(curso);
+        return cursoRepository.save(curso);
     }
 
     // ---------------------------------------------------------------
@@ -67,36 +63,36 @@ public class CursoService implements CursoIService {
     @Override
     public void delete(Long id) {
         if (id == null) throw new IllegalArgumentException("ID não pode ser nulo.");
-        dao.delete(id);
+        cursoRepository.deleteById(id);
     }
 
     // ---------------------------------------------------------------
     // FIND BY ID (Anotado como readOnly = true para otimização)
     // ---------------------------------------------------------------
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     @Override
     public Curso findById(Long id) {
         if (id == null) throw new IllegalArgumentException("ID não pode ser nulo.");
-        return dao.findById(id);
+        return cursoRepository.findByid(id);
     }
     
     // FIND BY NOME (Anotado como readOnly = true para otimização)
-    @Transactional(readOnly = true)
+   //@Transactional(readOnly = true)
     @Override
     public Curso findByNome(String nome) {
         if (StringUtil.isEmpty(nome)) {
             throw new IllegalArgumentException("Nome para busca não pode ser vazio.");
         }
-        return dao.findByNome(nome);
+        return cursoRepository.findBynome(nome);
     }
 
     // ---------------------------------------------------------------
     // FIND ALL (Anotado como readOnly = true para otimização)
     // ---------------------------------------------------------------
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     @Override
     public List<Curso> findAll() {
-        return dao.findAll();
+        return cursoRepository.findAll();
     }
 
     // ---------------------------------------------------------------
