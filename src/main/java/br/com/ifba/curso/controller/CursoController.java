@@ -6,38 +6,49 @@ package br.com.ifba.curso.controller;
 
 import br.com.ifba.curso.entity.Curso;
 import br.com.ifba.curso.service.CursoIService;
-import br.com.ifba.curso.service.CursoService;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
  * @author igo
  */
+
+@RestController
 public class CursoController implements CursoIController {
-    private final CursoIService service = new CursoService();
+    
+    @Autowired
+    private CursoIService cursoIservice;
 
     @Override
     public List<Curso> findAll() {
-        return service.findAll();
+        return cursoIservice.findAll();
     }
 
     @Override
     public Curso save(Curso curso) {
-        return service.save(curso);
+        return cursoIservice.save(curso);
     }
 
     @Override
     public Curso update(Curso curso) {
-        return service.update(curso);
+        return cursoIservice.update(curso);
     }
 
     @Override
     public void delete(Long id) {
-        service.delete(id);
+        cursoIservice.delete(id);
     }
 
     @Override
     public Curso findById(Long id) {
-        return service.findById(id);
+        return cursoIservice.findById(id);
+    }
+    
+   @Override
+    public Curso findByNome(String nome) {
+        return cursoIservice.findByNome(nome); // <-- DELEGA PARA O SERVICE
     }
 }

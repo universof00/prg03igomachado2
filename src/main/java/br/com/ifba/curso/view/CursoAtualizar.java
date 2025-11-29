@@ -4,38 +4,42 @@
  */
 package br.com.ifba.curso.view;
 
-import br.com.ifba.curso.dao.CursoDao;
-import br.com.ifba.curso.dao.CursoIDao;
+import br.com.ifba.curso.controller.CursoController;
+import br.com.ifba.curso.controller.CursoIController;
 import br.com.ifba.curso.entity.Curso;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
-import java.util.logging.Level;
+import java.io.ObjectInputFilter.Config;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author igo
  */
+@Component
 public class CursoAtualizar extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CursoAtualizar.class.getName());
 
-    /**
-     * Creates new form CursoAtualizar
-     */
-    
     private Curso cursoSelecionado;
+    private CursoListar telaPrincipal; 
+
+    @Autowired
+    private CursoIController cursoISalvar;
     
-    public CursoAtualizar() {
+    public CursoAtualizar(CursoIController cursoISalvar) {
+        this.cursoISalvar = cursoISalvar;
         initComponents();
-        
     }
     
-     private CursoListar telaPrincipal; // **SUBSTITUA** pelo nome real da sua classe principal
+    
+   private CursoAtualizar(){
+       initComponents();
+   }
    
-     
+    
+   
+    
      /**
      * Construtor recomendado.
      * Recebe a tela principal, obtém o curso selecionado nela e preenche
@@ -43,6 +47,10 @@ public class CursoAtualizar extends javax.swing.JFrame {
      *
      * @param telaPrincipal referência da janela que lista os cursos
      */
+    
+    
+    
+    
     public CursoAtualizar(CursoListar telaPrincipal) {
         initComponents();
         this.telaPrincipal = telaPrincipal; // Armazena a referência
@@ -52,8 +60,6 @@ public class CursoAtualizar extends javax.swing.JFrame {
              lblCodigoCurosoAntigo.setText(cursoSelecionado.getCodigo());
              lblNomeCursoAntigo.setText(cursoSelecionado.getNome());
              
-        }else{
-
         }
     }
     
@@ -67,28 +73,29 @@ public class CursoAtualizar extends javax.swing.JFrame {
     private void salvarEdicao() {
         String novoCodigo = txtNovoCodigo.getText();
         String novoNome = txtNovoNome.getText();
-         if (novoCodigo.isEmpty() || novoNome.isEmpty()) {
-             JOptionPane.showMessageDialog(this, "Preencha todos os campos.");
-             return;
-         }
-            
-         cursoSelecionado.setCodigo(novoCodigo);
-         cursoSelecionado.setNome(novoNome);
-         
-         CursoIDao cursoAtualizar = new CursoDao();
-         
-         Curso verificar = new Curso();
-         
-         verificar = cursoAtualizar.findById(cursoSelecionado.getId());
-         if(verificar != null){
-            cursoAtualizar.save(cursoSelecionado);
+        if (novoCodigo.isEmpty() || novoNome.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Preencha todos os campos.");
+            return;
+        }
+        
+        cursoSelecionado.setCodigo(novoCodigo);
+        cursoSelecionado.setNome(novoNome);
+        
+        // Valida se o controller está disponível
+        if (cursoISalvar == null) {
+            JOptionPane.showMessageDialog(this, "Erro interno: serviço não disponível.");
+            return;
+        }
+        
+        Curso verificar = cursoISalvar.findById(cursoSelecionado.getId());
+        if (verificar != null) {
+            cursoISalvar.save(cursoSelecionado);
             JOptionPane.showMessageDialog(this, "Curso atualizado!");
             dispose();
-         }else{
-             JOptionPane.showMessageDialog(this, "Não foi possível atualizar");
-             dispose();
-         }
-       
+        } else {
+            JOptionPane.showMessageDialog(this, "Não foi possível atualizar");
+            dispose();
+        }
      }
 
 
@@ -175,27 +182,7 @@ public class CursoAtualizar extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new CursoAtualizar().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAtualizar;

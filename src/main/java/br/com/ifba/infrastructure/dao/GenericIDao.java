@@ -11,7 +11,7 @@ import java.util.List;
  * @author igo
  */
 public interface GenericIDao<T> {
-    T save(T entity);
+     T save(T entity);
     T update(T entity);
     void delete(Long id);
     T findById(Long id);

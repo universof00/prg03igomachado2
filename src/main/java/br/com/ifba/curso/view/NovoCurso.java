@@ -4,16 +4,18 @@
  */
 package br.com.ifba.curso.view;
 
-import br.com.ifba.CursoSave;
-import br.com.ifba.curso.dao.CursoDao;
-import br.com.ifba.curso.dao.CursoIDao;
+import br.com.ifba.curso.controller.CursoController;
+import br.com.ifba.curso.controller.CursoIController;
 import br.com.ifba.curso.entity.Curso;
 import javax.swing.JOptionPane;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author igo
  */
+@Component 
 public class NovoCurso extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(NovoCurso.class.getName());
@@ -21,10 +23,15 @@ public class NovoCurso extends javax.swing.JFrame {
     /**
      * Creates new form NovoCurso
      */
-    public NovoCurso() {
+ 
+    @Autowired
+    private CursoIController cursoController;
+     
+    public NovoCurso(CursoIController cursoController) {
+        this.cursoController = cursoController;
         initComponents();
     }
-    
+
      /**
      * Construtor recomendado.
      * Recebe a tela principal para que, após criar um novo curso,
@@ -35,9 +42,8 @@ public class NovoCurso extends javax.swing.JFrame {
     
     private CursoListar telaPrincipal; 
    
-    public NovoCurso(CursoListar telaPrincipal) {
-        initComponents();
-        this.telaPrincipal = telaPrincipal; // Armazena a referência
+    public void setTelaPrincipal(CursoListar telaPrincipal) {
+        this.telaPrincipal = telaPrincipal;
     }
 
     /**
@@ -106,17 +112,17 @@ public class NovoCurso extends javax.swing.JFrame {
     private void btnAdicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarActionPerformed
         // TODO add your handling code here:
         
+        
         Curso novoCurso = new Curso(txtNomeCurso.getText(), txtCodigo.getText());
-
-        CursoIDao cursoAdicionar = new CursoDao(); 
-        Curso cursoSalvo = null; 
+        
+        Curso cursoSalvo = new Curso();
 
         try {
             
-            cursoSalvo = cursoAdicionar.save(novoCurso);
-
+            this.cursoController.save(novoCurso);
+            cursoSalvo = this.cursoController.findByNome(txtNomeCurso.getText());
           
-            JOptionPane.showMessageDialog(this, "Curso " + novoCurso.getNome() + " Salvo com sucesso! ID: " + cursoSalvo.getId());
+            JOptionPane.showMessageDialog(this, "Curso " + novoCurso.getNome() + " Salvo com sucesso!");
 
             
             if (this.telaPrincipal != null) {
@@ -128,7 +134,8 @@ public class NovoCurso extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Erro ao salvar o curso: " + e.getMessage(), "Erro de Persistência", JOptionPane.ERROR_MESSAGE);
 
         } finally {
-            
+            txtCodigo.setText("");
+            txtNomeCurso.setText("");
             dispose();
         }
     
@@ -137,27 +144,7 @@ public class NovoCurso extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new NovoCurso().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdicionar;

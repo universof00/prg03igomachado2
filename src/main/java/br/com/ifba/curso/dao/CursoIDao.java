@@ -6,21 +6,24 @@ package br.com.ifba.curso.dao;
 
 import br.com.ifba.curso.entity.Curso;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author igo
  */
+@Component
+
 public interface CursoIDao {
-    // Save or Update (Salvar ou Atualizar)
-    Curso save(Curso curso); 
-    
-    // Find by ID (Buscar por ID)
-    Curso findById(Long id); 
-    
-    // Find All (Buscar Todos)
-    List<Curso> findAll();
-    
-    // Delete (Deletar)
+  Curso save(Curso curso);
+
+    Curso update(Curso curso);
+
     void delete(Long id);
+
+    Curso findById(Long id);
+
+    List<Curso> findAll();
+
+    Curso findByNome(String nome);
 }

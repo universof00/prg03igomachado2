@@ -8,100 +8,56 @@ import br.com.ifba.curso.entity.Curso;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author igo
  */
+@Repository
 public class CursoDao implements CursoIDao {
-    private final static EntityManagerFactory EMF = 
-            Persistence.createEntityManagerFactory("poobanco2"); 
-    
-    private EntityManager getEntityManager() {
-        return EMF.createEntityManager();
-    }
-    
-    
+    @PersistenceContext
+    private EntityManager em;
+
     @Override
-    public Curso save(Curso curso) { 
-        EntityManager em = getEntityManager();
-        Curso courseSaved = null;
-        
-        try {
-            em.getTransaction().begin();
-            if (curso.getId() == null) {
-                //Salvando
-                em.persist(curso);
-                courseSaved = curso;
-            } else {
-                //atualizando
-                courseSaved = em.merge(curso);
-            }
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw new RuntimeException("Error saving/updating course.", e);
-        } finally {
-            if (em.isOpen()) {
-                em.close();
-            }
-        }
-        return courseSaved;
+    public Curso save(Curso curso) {
+        em.persist(curso);
+        return curso;
     }
-    
+
     @Override
-    public Curso findById(Long id) { 
-        EntityManager em = getEntityManager();
-        try {
-            return em.find(Curso.class, id);
-        } catch (Exception e) {
-            throw new RuntimeException("Error finding course by ID.", e);
-        } finally {
-            if (em.isOpen()) {
-                em.close();
-            }
+    public Curso update(Curso curso) {
+        return em.merge(curso);
+    }
+
+    @Override
+    public void delete(Long id) {
+        Curso curso = em.find(Curso.class, id);
+        if (curso != null) {
+            em.remove(curso);
         }
     }
-    
+
     @Override
-    public List<Curso> findAll() { // Renomeado para findAll
-        EntityManager em = getEntityManager();
-        try {
-            
-            return em.createQuery("SELECT c FROM Curso c", Curso.class).getResultList();
-        } catch (Exception e) {
-            throw new RuntimeException("Error finding all courses.", e);
-        } finally {
-            if (em.isOpen()) {
-                em.close();
-            }
-        }
+    public Curso findById(Long id) {
+        return em.find(Curso.class, id);
     }
-    
+
     @Override
-    public void delete(Long id) { 
-        EntityManager em = getEntityManager();
-        
-        try {
-            em.getTransaction().begin();
-            Curso curso = em.find(Curso.class, id); 
-            
-            if (curso != null) {
-                em.remove(curso);
-            }
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw new RuntimeException("Error deleting course.", e);
-        } finally {
-            if (em.isOpen()) {
-                em.close();
-            }
-        }
+    public List<Curso> findAll() {
+        return em.createQuery("SELECT c FROM Curso c", Curso.class)
+                 .getResultList();
+    }
+
+    @Override
+    public Curso findByNome(String nome) {
+        List<Curso> lista = em.createQuery(
+                "SELECT c FROM Curso c WHERE c.nome = :nome", Curso.class)
+                .setParameter("nome", nome)
+                .getResultList();
+
+        return lista.isEmpty() ? null : lista.get(0);
     }
 }

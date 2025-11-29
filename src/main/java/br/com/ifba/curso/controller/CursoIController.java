@@ -16,5 +16,6 @@ public interface CursoIController {
     Curso update(Curso curso);
     void delete(Long id);
     Curso findById(Long id);
+    Curso findByNome(String nome);
     List<Curso> findAll();
 }

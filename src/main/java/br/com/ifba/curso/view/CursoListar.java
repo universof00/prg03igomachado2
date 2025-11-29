@@ -4,15 +4,9 @@
  */
 package br.com.ifba.curso.view;
 
-import br.com.ifba.curso.dao.CursoDao;
-import br.com.ifba.curso.dao.CursoIDao;
+import br.com.ifba.curso.controller.CursoIController;
 import br.com.ifba.curso.entity.Curso;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;      // Necessário para o DocumentListener
 import javax.swing.event.DocumentListener;   // Necessário para o DocumentListener
@@ -22,24 +16,40 @@ import javax.swing.table.DefaultTableModel;  // Necessário para tipar o modelo
 import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author igo
  */
+@Component
 public class CursoListar extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CursoListar.class.getName());
     /** Controlador para ordenação e filtragem da JTable. */
     TableRowSorter<DefaultTableModel> sorter;
 
     /**
      * Creates new form CursoListar
      */
+    @Autowired
+    private  CursoIController cursoIController;
+  
+    @Autowired
+    private NovoCurso novoCursoFrame;
+    
     private Curso cursoSelecionado;
-    public CursoListar() {
+    
+    @Autowired
+    private CursoAtualizar cursoAtualizarFrame;
+
+    
+    public CursoListar(CursoIController cursoIController) {
+        this.cursoIController = cursoIController;
+        
         initComponents();
         carregarCursos();
+        
         DefaultTableModel modelo = (DefaultTableModel) jtListaDeCursos.getModel();
        
         sorter = new TableRowSorter<>(modelo);
@@ -68,49 +78,24 @@ public class CursoListar extends javax.swing.JFrame {
             }
         }
     });
-
-            
-       
-       
-         
+     
     }
-  
+
      /**
      * Carrega a lista de cursos do banco de dados e preenche a JTable.
      * Utiliza JPA para acessar o banco.
      */
     void carregarCursos() {
-   
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("poobanco2"); 
-        EntityManager em = emf.createEntityManager();
 
-        List<Curso> cursos = new ArrayList<Curso>();
-
-        try {
-            cursos = em.createQuery("SELECT c FROM Curso c", Curso.class).getResultList();
-
-            DefaultTableModel model = (DefaultTableModel) jtListaDeCursos.getModel();
-
-            model.setRowCount(0); 
-
-            for (Curso curso : cursos) {
-                model.addRow(new Object[]{
-                    curso.getId(),
-                    curso.getCodigo(), 
-                    curso.getNome()
-                });
-            }
-
-        } catch (Exception e) {
-            logger.log(java.util.logging.Level.SEVERE, "Erro ao carregar cursos", e);
-            javax.swing.JOptionPane.showMessageDialog(this, "Erro ao carregar os dados dos cursos: " + e.getMessage(), "Erro de Banco de Dados", javax.swing.JOptionPane.ERROR_MESSAGE);
-        } finally {
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
-            if (emf != null && emf.isOpen()) {
-                emf.close();
-            }
+        List<Curso> cursos = cursoIController.findAll();
+        DefaultTableModel model = (DefaultTableModel) jtListaDeCursos.getModel();
+        model.setRowCount(0);
+        for (Curso curso : cursos) {
+            model.addRow(new Object[]{
+                curso.getId(),
+                curso.getCodigo(),
+                curso.getNome()
+            });
         }
     }
     
@@ -202,7 +187,6 @@ public class CursoListar extends javax.swing.JFrame {
             Long id = (Long) jtListaDeCursos.getValueAt(linhaSelecionada, 0);
             String codigo = (String) jtListaDeCursos.getValueAt(linhaSelecionada, 1);
             String nome = (String) jtListaDeCursos.getValueAt(linhaSelecionada, 2);
-
             Curso cursoSelecionado = new Curso();
             cursoSelecionado.setId(id);
             cursoSelecionado.setCodigo(codigo);
@@ -231,10 +215,8 @@ public class CursoListar extends javax.swing.JFrame {
         lblTextoPesquisar = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         txtbuscar.setFont(new java.awt.Font("Liberation Sans", 0, 18)); // NOI18N
-        getContentPane().add(txtbuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 80, 180, -1));
 
         btnAdicionar.setFont(new java.awt.Font("Liberation Sans", 0, 36)); // NOI18N
         btnAdicionar.setText("+");
@@ -243,7 +225,6 @@ public class CursoListar extends javax.swing.JFrame {
                 btnAdicionarActionPerformed(evt);
             }
         });
-        getContentPane().add(btnAdicionar, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 40, 190, 80));
 
         jtListaDeCursos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -273,8 +254,6 @@ public class CursoListar extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jtListaDeCursos);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 148, 780, 286));
-
         btnEditar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnEditar.setText("Editar");
         btnEditar.addActionListener(new java.awt.event.ActionListener() {
@@ -282,7 +261,6 @@ public class CursoListar extends javax.swing.JFrame {
                 btnEditarActionPerformed(evt);
             }
         });
-        getContentPane().add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 60, 110, 60));
 
         btnApagar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnApagar.setText("Apagar");
@@ -291,27 +269,62 @@ public class CursoListar extends javax.swing.JFrame {
                 btnApagarActionPerformed(evt);
             }
         });
-        getContentPane().add(btnApagar, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 60, 110, 60));
 
         lblTextoPesquisar.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         lblTextoPesquisar.setText("Pesquisar");
-        getContentPane().add(lblTextoPesquisar, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, -1, -1));
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(40, 40, 40)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTextoPesquisar)
+                    .addComponent(txtbuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(70, 70, 70)
+                .addComponent(btnAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(50, 50, 50)
+                .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addComponent(btnApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 780, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(40, 40, 40)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblTextoPesquisar)
+                        .addGap(11, 11, 11)
+                        .addComponent(txtbuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(28, 28, 28)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAdicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarActionPerformed
-        // TODO add your handling code here:
-         NovoCurso telaCadastro = new NovoCurso(this); 
-         telaCadastro.setVisible(true);
+     
+        this.novoCursoFrame.setTelaPrincipal(this); 
+        this.novoCursoFrame.setVisible(true);
     }//GEN-LAST:event_btnAdicionarActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
         // TODO add your handling code here:
         
         Curso cursoParaAtualizar = getCursoSelecionado();
-        CursoIDao cursoAtualizar = new CursoDao();
-        //para verificar se é null ou não
+        
         Curso validarAtualizar = new Curso();
     
         if (cursoParaAtualizar == null) {
@@ -319,7 +332,7 @@ public class CursoListar extends javax.swing.JFrame {
             return;
         }
         
-        validarAtualizar = cursoAtualizar.findById(cursoParaAtualizar.getId());
+        validarAtualizar = cursoIController.findById(cursoParaAtualizar.getId());
         /**
          * se for diferente de null chama a tela para editar e atualizar sabendo o objeto
          * tem no banco de dados
@@ -333,83 +346,48 @@ public class CursoListar extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnApagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApagarActionPerformed
-        // TODO add your handling code here:
-        Curso cursoParaDeletar = getCursoSelecionado();
-        CursoIDao cursoApagar = new CursoDao();
-        //para verificar se é null ou não
-        Curso validarApagar = new Curso();
+       Curso cursoParaDeletar = getCursoSelecionado();
     
         if (cursoParaDeletar == null) {
             JOptionPane.showMessageDialog(this, "Nenhum curso foi selecionado para apagar.", "Erro", JOptionPane.ERROR_MESSAGE);
-            return; // Sai do método se for nulo
+            return;
         }
-    
+
         int confirmacao = JOptionPane.showConfirmDialog(
-                    null,
-                    "AVISO! O CURSO SERÁ APAGAGO!\nTem certeza que deseja continuar?",
-                    "Apagar Curso",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE
-            );
+                this, 
+                "AVISO! O CURSO SERÁ APAGADO!\nTem certeza que deseja continuar?",
+                "Apagar Curso",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
 
         if (confirmacao == JOptionPane.YES_OPTION) {
-            
             try {
-                //busca no banco para ver se realmente tem, caso tenha no if
-                validarApagar = cursoApagar.findById(cursoParaDeletar.getId());
-
-                if (validarApagar != null) {
-
-                    cursoApagar.delete(cursoParaDeletar.getId());
-
-                    JOptionPane.showMessageDialog(this,
-                        "Curso '" + cursoParaDeletar.getNome() + "' apagado com sucesso!");
-
-                    carregarCursos();
-                } else {
-                    JOptionPane.showMessageDialog(this,
-                        "Curso não encontrado no banco de dados.",
-                        "Erro",
-                        JOptionPane.ERROR_MESSAGE);
-                }
-
-            } catch (Exception e) {
+                // 1. CHAMA O CONTROLLER INJETADO para realizar a operação.
+                // A verificação de existência será feita implicitamente no Service/DAO.
+                cursoIController.delete(cursoParaDeletar.getId()); 
 
                 JOptionPane.showMessageDialog(this,
-                    "Erro ao apagar curso: " + e.getMessage(),
+                    "Curso '" + cursoParaDeletar.getNome() + "' apagado com sucesso!");
+
+                // 2. Atualiza a lista
+                carregarCursos();
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                    "Erro ao apagar curso: " + e.getMessage() + "\nO ID pode não existir ou há restrições de chave estrangeira.",
                     "Erro",
                     JOptionPane.ERROR_MESSAGE);
 
                 e.printStackTrace(); // para debug no console
             }
-        
         }
     }//GEN-LAST:event_btnApagarActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new CursoListar().setVisible(true));
-    }
+  
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdicionar;
