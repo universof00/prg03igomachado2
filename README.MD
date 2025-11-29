@@ -15,4 +15,4 @@ Esse Repositório tem como objetivo adicionar todas as atividades da disciplina 
 - Atividade 13: ✅ - (DAO)
 - Atividade 14: ✅ - (Arquitetura em Camadas)
 - Atividade 15: ✅ - (Spring Framewok)
-
+- Atividade 16: ✅ - (Spring Data Repository)
