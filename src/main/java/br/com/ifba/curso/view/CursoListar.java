@@ -39,7 +39,7 @@ public class CursoListar extends javax.swing.JFrame {
     @Autowired
     private NovoCurso novoCursoFrame;
     
-    private Curso cursoSelecionado;
+    //private Curso cursoSelecionado;
     
     @Autowired
     private ApplicationContext applicationContext;
@@ -58,6 +58,8 @@ public class CursoListar extends javax.swing.JFrame {
         
          btnEditar.setVisible(false);
          btnApagar.setVisible(false);
+         
+         
          
          /**
          * Listener para detectar seleção de linhas na tabela.

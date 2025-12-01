@@ -9,63 +9,33 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  *
  * @author igo
  */
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "cursos")
 public class Curso {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @Getter @Setter private Long id;
     
-    private String nome;
-    private String codigo;
-    private boolean status; 
+    @Getter @Setter private String nome;
+    @Getter @Setter private String codigo;
+    @Getter @Setter private boolean status;
 
-    public Curso(String nome, String codigo) {
+    public Curso(String nome, String codigo, boolean status) {
         this.nome = nome;
         this.codigo = codigo;
-        this.status = true;
-    }
-
-    public Curso() {
-    }
-    
-    
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
         this.status = status;
     }
-  
+    
+    
 }

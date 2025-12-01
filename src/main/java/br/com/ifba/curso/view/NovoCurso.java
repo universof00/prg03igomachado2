@@ -113,7 +113,7 @@ public class NovoCurso extends javax.swing.JFrame {
         // TODO add your handling code here:
         
         
-        Curso novoCurso = new Curso(txtNomeCurso.getText(), txtCodigo.getText());
+        Curso novoCurso = new Curso(txtNomeCurso.getText(), txtCodigo.getText(), true);
         
         Curso cursoSalvo = new Curso();
 
@@ -129,16 +129,19 @@ public class NovoCurso extends javax.swing.JFrame {
                 this.telaPrincipal.adicionarLinhaNaTabela(cursoSalvo); 
             }
 
-        } catch (Exception e) {
-             
-            JOptionPane.showMessageDialog(this, "Erro ao salvar o curso: " + e.getMessage(), "Erro de Persistência", JOptionPane.ERROR_MESSAGE);
-
+        }catch (Exception e) {
+            // Erros inesperados
+            JOptionPane.showMessageDialog(this, 
+                "Ocorreu um erro inesperado ao salvar o curso.", 
+                "Erro",
+                JOptionPane.ERROR_MESSAGE
+            );
         } finally {
-            txtCodigo.setText("");
-            txtNomeCurso.setText("");
-            dispose();
-        }
-    
+                txtCodigo.setText("");
+                txtNomeCurso.setText("");
+                dispose();
+            }
+
     }//GEN-LAST:event_btnAdicionarActionPerformed
 
     /**

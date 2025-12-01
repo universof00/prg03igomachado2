@@ -25,13 +25,16 @@ public class CursoAtualizar extends javax.swing.JFrame {
     
     @Autowired
     public CursoAtualizar(CursoIController controller) {
-        this.cursoISalvar = controller; // O Spring injeta o controller aqui
+        this.cursoISalvar = controller; 
         initComponents();
+        
     }
 
     private CursoAtualizar() {
         initComponents();
     }
+    
+    
      /**
      * Construtor recomendado.
      * Recebe a tela principal, obtém o curso selecionado nela e preenche
@@ -63,6 +66,7 @@ public class CursoAtualizar extends javax.swing.JFrame {
      * Exibe mensagens de sucesso ou erro conforme o resultado.
      */
     private void salvarEdicao() {
+        
         String novoCodigo = txtNovoCodigo.getText();
         String novoNome = txtNovoNome.getText();
         if (novoCodigo.isEmpty() || novoNome.isEmpty()) {
@@ -80,9 +84,21 @@ public class CursoAtualizar extends javax.swing.JFrame {
         
         Curso verificar = cursoISalvar.findById(cursoSelecionado.getId());
         if (verificar != null) {
-            cursoISalvar.save(cursoSelecionado);
-            JOptionPane.showMessageDialog(this, "Curso atualizado!");
-            dispose();
+            
+            try{
+                cursoISalvar.save(cursoSelecionado);
+                JOptionPane.showMessageDialog(this, "Curso atualizado!");
+                dispose();
+            }catch(IllegalArgumentException e){
+                
+                JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Erro de validação",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+            
         } else {
             JOptionPane.showMessageDialog(this, "Não foi possível atualizar");
             dispose();
@@ -96,8 +112,8 @@ public class CursoAtualizar extends javax.swing.JFrame {
         if (this.cursoSelecionado != null) {
             lblCodigoCurosoAntigo.setText(cursoSelecionado.getCodigo());
             lblNomeCursoAntigo.setText(cursoSelecionado.getNome());
-            txtNovoCodigo.setText(cursoSelecionado.getCodigo());
-            txtNovoNome.setText(cursoSelecionado.getNome());
+            txtNovoCodigo.setText("");
+            txtNovoNome.setText("");
         }
     }
     

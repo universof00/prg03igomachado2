@@ -8,7 +8,6 @@ import br.com.ifba.curso.entity.Curso;
 import br.com.ifba.curso.service.CursoIService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -49,6 +48,6 @@ public class CursoController implements CursoIController {
     
    @Override
     public Curso findByNome(String nome) {
-        return cursoIservice.findByNome(nome); // <-- DELEGA PARA O SERVICE
+        return cursoIservice.findByNome(nome); 
     }
 }
